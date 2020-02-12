@@ -1,0 +1,1 @@
+Sample files for blogpost [timvw.be](https://timvw.be/) terraform-azure-k8s-acr-kaniko
