@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-helloworld
+spec:
+  completions: 1
+  template:
+    metadata:
+      name: build-helloworld
+      labels:
+        app: build
+        build: helloworld
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:latest
+        args: ["--dockerfile=Dockerfile",
+            "--context=git://github.com/timvw/sample-terraform-azure-k8s-acr-kaniko.git",
+            "--destination=icteam.azurecr.io/helloworld:latest"]
+        volumeMounts:
+          - name: context
+            mountPath: /context
+          - name:  registry-creds
+            mountPath: /root/
+      volumes:
+        - name: registry-creds
+          projected:
+            sources:
+            - secret:
+                name: acr-secret
+                items:
+                - key: .dockerconfigjson
+                  path: .docker/config.json
+        - name: context
+          emptyDir: {}
